@@ -134,10 +134,13 @@ def simulate_seating(_passengers):
 
                 # check if we can seat this passenger in the current row 
                 if current_row.passenger.seat_assignment == current_row.row:
-                    # this is where we need to pause the simulation for the number of ticks 
 
-                    current_row.passenger.seat_time(tickCount) # set the time that the passenger sat at 
-                    current_row.passenger = None # remove person from aisle
+                    # this is where we need to pause this persons ability to enter the row to create slow downs
+                    if current_row.passenger.delay == 0:
+                        current_row.passenger.seat_time(tickCount) # set the time that the passenger sat at 
+                        current_row.passenger = None # remove person from aisle
+                    else:
+                        current_row.passenger.delay -= 1
                 else:
                     # if we can move this person forward, move them forward and remove them from the current aisle position
                     if current_row.behind and current_row.behind.passenger == None:
