@@ -1,4 +1,5 @@
 import copy
+import random
 
 rows = 10
 
@@ -7,6 +8,7 @@ class Person:
     delay = None
     seat_assignment = None
     seat_time = None
+    id = random.randint(100, 999) #random 3 digit id
 
     def __init__(self, delay, seat_assignment):
         self.delay = delay
@@ -22,6 +24,9 @@ class Person:
     # sets the time that the passenger was sat at
     def seat_time(self, time):
         self.seat_time = time
+
+    def __str__(self):
+        return str(self.id)
     
 
 # represents a position node in the aisle linked list
@@ -36,9 +41,11 @@ class AisleNode:
     # adds a new node behind the current node in the plane
     def add_to_end(self, node):
         if (self.behind == None):
+            node.ahead = self
             self.behind = node
         else:
             self.behind.add_to_end(node)
+
 
     def add_person_to_node(self, person):
         self.passenger = person
@@ -50,9 +57,10 @@ class AisleNode:
     # represents the current state of this aisle node as a string
     def to_string(self):
         if self.passenger:
-            return 'X'
+            # return 'X'
+            return str(self.passenger.seat_assignment)
         else:
-            return '-'
+            return '_'
 
 
 
@@ -64,7 +72,7 @@ class Aisle:
     def __init__(self, rows):
         self.head = AisleNode(0)
         
-        for i in range(rows - 1):
+        for i in range(1, rows):
             self.head.add_to_end(AisleNode(i))
 
     # represents the current state of this aisle as a string
@@ -72,21 +80,20 @@ class Aisle:
         output = ''
         current_node = self.head
         while current_node:
-            output += ' --> ' + current_node.to_string()
+            output += ' -> ' + current_node.to_string()
             current_node = current_node.behind
         return output
         
 
     # initializes one time-unit of movements throughout the aisle. individuals will move as appropriate when possible during the tic
     def onTick():
-    
         pass
 
     # returns the last node in the linked list
     def get_last_node(self):
         last_node = self.head
 
-        while last_node.next:
+        while last_node.behind:
             last_node = last_node.behind
         
         return last_node
@@ -103,21 +110,21 @@ class Aisle:
         return True
 
 
-
 def simulate_seating(_passengers):
     passengers = copy.deepcopy(_passengers) # make a copy we can mutate
 
     all_passengers_seated = False
 
     aisle = Aisle(rows)
-    print(aisle)
 
     # FOR NOW, just count number of ticks needed to seat the plane in full
     tickCount = 0
 
     # continue to seat passengers until everyone is in their seats
-    while not all_passengers_seated and not aisle.empty():
+    while not all_passengers_seated:
         current_row = aisle.get_last_node()
+
+        print(aisle)
 
         # one tic is going through the aisle and making appropriates updates to passenger positions 
         while current_row:
@@ -137,15 +144,24 @@ def simulate_seating(_passengers):
                         current_row.behind.passenger = current_row.passenger
                         current_row.passenger = None
                 
-                # if we are looking at the first aisle position and its empty, 
+            # if we are looking at the first node in the aisle (first aisle position) add in a new passenger to the linked list
+            if current_row.row == 0: 
+                # if there are no more passengers to add 
+                if len(passengers) < 1:
+                    return tickCount
+
+                # add passenger to aisle linked list
+                if current_row.passenger == None:
+                    current_row.passenger = passengers.pop(0)
+
             current_row = current_row.ahead
 
         tickCount += 1
-        
+
     return tickCount
 
 
-p1 = Person(3, 2)
+p1 = Person(3, 0)
 p2 = Person(3, 3)
 p3 = Person(3, 4)
 p4 = Person(3, 1)
