@@ -1,5 +1,5 @@
 from passenger import Passenger
-from collections import deque
+import random
 
 # seats = [[] * 38]
 seats = [[] * 5]
@@ -60,30 +60,54 @@ def time_to_seat(seat, speed, seating_arrangement):
 
 # takes a list of people with seating arrangement
 def seater(passengers): 
-    # Initialize a queue to represent the order of passengers waiting in the aisle
-    boarding_queue = deque(passengers)
-    
-    # Initialize a dictionary to store the position of each passenger
-    position = {passenger: 0 for passenger in passengers}
-    
+
     time = 0  # Initialize the time counter
 
-    while boarding_queue:
-        current_passenger = boarding_queue.popleft()  # Get the next passenger in the aisle
-        seat_position = passengers.index(current_passenger)
-        
-        # Calculate the time it takes for the passenger to reach their seat
-        time_to_seat = abs(seat_position - position[current_passenger])
-        
-        # Update the passenger's position
-        position[current_passenger] = seat_position
-        
-        # Increment the total time
-        time += time_to_seat
-        
-        # Print the boarding process for visualization
-        print(f"Time {time}: {current_passenger} is seated at position {seat_position}")
-    
-    print(f"Total boarding time: {time} minutes")
+    random.shuffle(passengers)
 
-time_to_seat = seater(passengers)
+    backups = make_backup_list(passengers)
+
+
+    for backup in backups:
+        for thing in backup:
+            print(thing.seat)
+        print()
+
+
+def make_backup_list(passengers):
+    # divide the array of passangers into a list of subarrays of "hold ups".
+    # a hold up is any group of people that are slowed by a person in front of them. 
+    # these groups will serve as subqueues
+
+    backups = [] # stores list of sub arrays of backups 
+
+    sub_group = [] # stores the individual back up list
+    for pas in passengers:
+
+        # add this passenger to a subgroup or start a new subgroup
+
+        # criteria to add a passenger to a subgroup: 
+        #   1. If a person is seated behind the person seating before them
+        #   2. If a person is seated in front the person seating before them but this person is faster than the person in front, or if the person in front is slow
+
+
+        if len(sub_group) > 0:
+            passenger_in_front = sub_group[-1]
+
+            # if the passenger in front of this person causes a hold up for this person
+            if passenger_in_front.seat[0] >= pas.seat[0] or passenger_in_front.speed < pas.speed:
+                sub_group.append(pas)
+            else:
+                backups.append(sub_group)
+                sub_group = []
+        else:
+            sub_group.append(pas)
+
+    return backups
+        
+time_ = seater(passengers)
+print(time_)
+
+
+
+
