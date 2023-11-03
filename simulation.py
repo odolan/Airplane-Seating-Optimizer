@@ -1,13 +1,16 @@
 import copy
 
-rows = 34
+rows = 10
 
 # represents a person who is going to board the plane
 class Person:
-    def __init__(self, delay, seat_assignment, passenger_data):
+    delay = None
+    seat_assignment = None
+    seat_time = None
+
+    def __init__(self, delay, seat_assignment):
         self.delay = delay
         self.seat_assignment = seat_assignment
-        self.passenger_data = passenger_data
 
     # checks to see if the person is in their respective seat
     def isInSeat(self, row):
@@ -15,6 +18,10 @@ class Person:
             return True
         else :              
             return False
+    
+    # sets the time that the passenger was sat at
+    def seat_time(self, time):
+        self.seat_time = time
     
 
 # represents a position node in the aisle linked list
@@ -40,9 +47,12 @@ class AisleNode:
     def single_tick():
         pass
         
-    # represents the current state of this aisle as a string
-    def __str__(self):
-        pass
+    # represents the current state of this aisle node as a string
+    def to_string(self):
+        if self.passenger:
+            return 'X'
+        else:
+            return '-'
 
 
 
@@ -56,6 +66,16 @@ class Aisle:
         
         for i in range(rows - 1):
             self.head.add_to_end(AisleNode(i))
+
+    # represents the current state of this aisle as a string
+    def __str__(self):
+        output = ''
+        current_node = self.head
+        while current_node:
+            output += ' --> ' + current_node.to_string()
+            current_node = current_node.behind
+        return output
+        
 
     # initializes one time-unit of movements throughout the aisle. individuals will move as appropriate when possible during the tic
     def onTick():
@@ -90,6 +110,7 @@ def simulate_seating(_passengers):
     all_passengers_seated = False
 
     aisle = Aisle(rows)
+    print(aisle)
 
     # FOR NOW, just count number of ticks needed to seat the plane in full
     tickCount = 0
@@ -108,6 +129,7 @@ def simulate_seating(_passengers):
                 if current_row.passenger.seat_assignment == current_row.row:
                     # this is where we need to pause the simulation for the number of ticks 
 
+                    current_row.passenger.seat_time(tickCount) # set the time that the passenger sat at 
                     current_row.passenger = None # remove person from aisle
                 else:
                     # if we can move this person forward, move them forward and remove them from the current aisle position
@@ -119,13 +141,15 @@ def simulate_seating(_passengers):
             current_row = current_row.ahead
 
         tickCount += 1
-
-        # add the next person to the aisle if no one is in the first aisle position
-        # if aisle.head.passenger == None:
-        #     if len(passengers) > 0:
-        #         pass
-        #     else:
-        #         all_passengers_seated
-
         
     return tickCount
+
+
+p1 = Person(3, 2)
+p2 = Person(3, 3)
+p3 = Person(3, 4)
+p4 = Person(3, 1)
+p5 = Person(3, 1)
+
+passengers = [p1, p2, p3, p4, p5]
+print(simulate_seating(passengers))
