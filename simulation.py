@@ -1,8 +1,6 @@
 import copy
 import random
 
-rows = 10
-
 # represents a person who is going to board the plane
 class Person:
     delay = None
@@ -27,7 +25,6 @@ class Person:
 
     def __str__(self):
         return str(self.id)
-    
 
 # represents a position node in the aisle linked list
 class AisleNode:
@@ -46,23 +43,21 @@ class AisleNode:
         else:
             self.behind.add_to_end(node)
 
-
+    # updates this node to now reference the given person
+    # IMPORTANT: throws an error if this already references a person.
     def add_person_to_node(self, person):
-        self.passenger = person
-
-    # ticks this cell, moving the person it may or may not contain as appropriate
-    def single_tick():
-        pass
+        if self.person != None:
+            self.passenger = person
+        else:
+            return ValueError
         
     # represents the current state of this aisle node as a string
     def to_string(self):
         if self.passenger:
             # return 'X'
-            return str(self.passenger.seat_assignment)
+            return str("(" + str(self.passenger.delay) + "," + str(self.passenger.seat_assignment) + ")")
         else:
             return '_'
-
-
 
 # represents a list of aisle cells for a certain number of rows in an airplane
 class Aisle:
@@ -83,13 +78,8 @@ class Aisle:
             output += ' -> ' + current_node.to_string()
             current_node = current_node.behind
         return output
-        
 
-    # initializes one time-unit of movements throughout the aisle. individuals will move as appropriate when possible during the tic
-    def onTick():
-        pass
-
-    # returns the last node in the linked list
+    # returns the last node in this aisle
     def get_last_node(self):
         last_node = self.head
 
@@ -109,13 +99,24 @@ class Aisle:
         
         return True
 
+# returns the maximum row observed among the list of passengers
+def getMaxRow(passengers):
+    maxRow = 0
+    for passenger in passengers:
+        if passenger.seat_assignment > maxRow:
+            maxRow = passenger.seat_assignment
+    
+    return maxRow
 
-def simulate_seating(_passengers):
-    passengers = copy.deepcopy(_passengers) # make a copy we can mutate
+# runs a full simulation of seating the given list of passengers, seating them in the order in which they were supplied to the function
+def simulate_seating(passengers):
+    passengers = copy.deepcopy(passengers) # make a copy we can mutate
 
     all_passengers_seated = False
 
-    aisle = Aisle(rows)
+    # runs a simulation/builds aisle using number of rows needed based on list of passengers' seat assignments
+    numRowsNeeded = getMaxRow(passengers)
+    aisle = Aisle(numRowsNeeded)
 
     # FOR NOW, just count number of ticks needed to seat the plane in full
     tickCount = 0
@@ -125,6 +126,7 @@ def simulate_seating(_passengers):
         current_row = aisle.get_last_node()
 
         print(aisle)
+        print()
 
         # one tic is going through the aisle and making appropriates updates to passenger positions 
         while current_row:
@@ -163,12 +165,22 @@ def simulate_seating(_passengers):
 
     return tickCount
 
+# # # Person (delay, row)
+# # p1 = Person(3, 0)
+# # p2 = Person(3, 3)
+# # p3 = Person(3, 4)
+# # p4 = Person(3, 1)
+# # p5 = Person(3, 1)
 
-p1 = Person(3, 0)
-p2 = Person(3, 3)
-p3 = Person(3, 4)
-p4 = Person(3, 1)
-p5 = Person(3, 1)
+# # passengers = [p1, p2, p3, p4, p5]
 
-passengers = [p1, p2, p3, p4, p5]
-print(simulate_seating(passengers))
+# randPassengers = []
+
+# for i in range(90):
+#     randPassengers.append(Person(random.randint(0, 8), int(i / 3)))
+
+# random.shuffle(randPassengers)
+
+# # print(getMaxRow(passengers))
+# # print(simulate_seating(passengers))
+# print(simulate_seating(randPassengers))
