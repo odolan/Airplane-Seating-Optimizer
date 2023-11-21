@@ -2,7 +2,9 @@ import random
 
 # Represents a passenger on the plane.
 class Person:
-    delay = None
+    # probability between 0 and 1 that, when an action is available for the person to take, they actually take it
+    # (old people / families more inclined to miss actions, for example)
+    delay_prob = None
     # where the passenger will be seated on the airplane
     seat_assignment = None
     # number of ticks that took place before passenger was seated
@@ -14,7 +16,7 @@ class Person:
 
     # creates a new person with the given delay factor and seat assignment
     def __init__(self, delay, seat_assignment, special_classes):
-        self.delay = delay
+        self.delay_prob = delay
         self.seat_assignment = seat_assignment
         for category in special_classes:
             self.classes.append(category)
@@ -25,10 +27,6 @@ class Person:
             return True
         else :              
             return False
-    
-    # notes this passenger that they arrived at their seat assignment after supplied number of ticks (time)
-    def seat_time(self, time):
-        self.seat_time = time
 
     # Returns a string of information about the passenger, including their id and seat assignment
     def __str__(self):
@@ -37,3 +35,7 @@ class Person:
     # Method used to visualize a passenger on the airplane (not just generic information about them)
     def visualize(self):
         return str(self.seat_assignment)
+
+    # returns true with probability of 1 - delay_prob, false with probability of delay_prob
+    def take_action(self):
+        return random.uniform(0, 1) > self.delay_prob
