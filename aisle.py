@@ -9,6 +9,9 @@ class AisleNode:
     
     # ** no init function needed **
 
+    def empty(self):
+        return self._passenger == None
+
     # adds a new node to the END of this list - meaning AHEAD of this node, close to the TAIL of the plane
     def add_to_end(self, node):
         if (self.ahead == None):

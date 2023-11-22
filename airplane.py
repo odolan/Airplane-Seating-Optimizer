@@ -26,18 +26,21 @@ class Airplane:
     aisle = None
     below_cols = []
 
+    passengers = []
+
     # builds an airplane with given dimensions and list of passengers
     # (columns = seats per row on each side)
     def __init__(self, rows, columns, passengers):
         self.aisle = Aisle(rows)
+        self.passengers = passengers
 
         # builds out seats in specified dimensions
-        for above_column in range(columns / 2):
+        for above_column in range(columns):
             self.above_cols.append([])
             for row in range(rows):
                 self.above_cols[above_column].append(Seat())
 
-        for below_column in range(columns / 2):
+        for below_column in range(columns):
             self.below_cols.append([])
             for row in range(rows):
                 self.below_cols[below_column].append(Seat())
@@ -47,11 +50,28 @@ class Airplane:
         result = ''
 
         for col in self.above_cols:
-            result += str(col)
+            for seat in col:
+                result += str(seat)
+            result += "\n"
 
         result += str(self.aisle)
+        result += "\n"
 
         for col in self.below_cols:
-            result += str(col)
+            for seat in col:
+                result += str(seat)
+            result += "\n"
     
         return result
+
+    # initiates a single tick of movement throughout the aisle. adds passengers in order they are provided to the airplane at
+    # construction, uses given tick_count
+    def single_tick(self, tick_count):
+        self.aisle.single_tick()
+
+        if self.aisle.head.empty() and len(self.passengers) is not 0:
+            self.aisle.head.add_person_to_node(self.passengers.pop(0))
+
+
+example = Airplane(20, 4, [])
+print(str(example))
