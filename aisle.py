@@ -1,3 +1,5 @@
+from person import Person
+
 # represents a position node in the aisle linked list
 class AisleNode:
     # the node "ahead" of this - closer to the BACK of the plane
@@ -6,9 +8,13 @@ class AisleNode:
     behind = None
     # what is "in" this node at the moment, has an underscore as should not be accessed directly by other objects for the most part
     _passenger = None
-    
-    # ** no init function needed **
 
+    row = 0
+
+    def __init__(self, row):
+        self.row = row
+
+    # returns whether this node is empty
     def empty(self):
         return self._passenger == None
 
@@ -22,7 +28,7 @@ class AisleNode:
 
     # updates this node to now reference the given person, throws an error if the node already holds a person.
     def add_person_to_node(self, person):
-        if self._passenger != None:
+        if self._passenger == None:
             self._passenger = person
         else:
             return ValueError
@@ -38,19 +44,24 @@ class AisleNode:
     # given the number of the current "tick" to pass to passengers as appropriate
     # returns TRUE if attempted to take a movement (had a passenger)
     def single_tick(self, tick_count):
+        print("tick ", self.row)
         # only does something if this node has a passenger
         if self._passenger != None and self._passenger.take_action():
             # Is the passenger currently in their row? --> Make progress towards seating them
             if self._passenger.seat_assignment[0] == self.row:
                 self._passenger.seat(tick_count)
+                self._passenger = None
             # If not, make progress towards moving them towards their row (guaranteed to be ahead of them)
             # (Does not check if there is an ahead cell - if the passenger isn't in their current row, there ought to be one ahead of them,
             # if there is not, implies an issue with setup)
-            elif not self.ahead.passenger:
-                self.ahead.add_person_to_node(self.passenger)
-                self.passenger = None
+            elif self.ahead.empty():
+                print("TRIED TO MOVE UP")
+                self.ahead.add_person_to_node(self._passenger)
+                self._passenger = None
 
             return True
+
+        return False
 
 # represents a list of aisle cells for a certain number of rows in an airplane
 class Aisle:
@@ -59,10 +70,10 @@ class Aisle:
     # initializes an aisle of given number of rows (nodes) that is at least 1, holds a reference to the first cell
     # (closest to the nose of the airplane - where passengers enter from)
     def __init__(self, rows):
-        self.head = AisleNode()
+        self.head = AisleNode(0)
 
         for i in range(1, rows):
-            self.head.add_to_end(AisleNode())
+            self.head.add_to_end(AisleNode(i))
 
     # represents the current state of this aisle as a string
     def __str__(self):
@@ -81,8 +92,8 @@ class Aisle:
     def get_last_node(self):
         last_node = self.head
 
-        while last_node.behind:
-            last_node = last_node.behind
+        while last_node.ahead:
+            last_node = last_node.ahead
         
         return last_node
     
@@ -91,7 +102,7 @@ class Aisle:
         current_node = self.head
 
         while current_node:
-            if current_node.passenger != None:
+            if not current_node.empty():
                 return False
             current_node = current_node.ahead
         
@@ -111,3 +122,30 @@ class Aisle:
             tail = tail.behind
         
         return something_happened
+
+example_aisle = Aisle(5)
+print(example_aisle)
+
+# person = Person(0, (4, 4))
+# example_aisle.head._passenger = person
+# print(example_aisle)
+
+# example_aisle.run_tick(1)
+# print(example_aisle)
+# print("SAT: ", person.isInSeat())
+
+# example_aisle.run_tick(1)
+# print(example_aisle)
+# print("SAT: ", person.isInSeat())
+
+# example_aisle.run_tick(1)
+# print(example_aisle)
+# print("SAT: ", person.isInSeat())
+
+# example_aisle.run_tick(1)
+# print(example_aisle)
+# print("SAT: ", person.isInSeat())
+
+# example_aisle.run_tick(1)
+# print(example_aisle)
+# print("SAT: ", person.isInSeat())

@@ -31,7 +31,7 @@ class Person:
 
     # Returns a string of information about the passenger, including their id and seat assignment
     def __str__(self):
-        return self.id
+        return "o"
 
     # Method used to visualize a passenger on the airplane (not just generic information about them)
     def visualize(self):
