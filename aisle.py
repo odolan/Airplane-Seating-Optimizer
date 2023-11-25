@@ -1,10 +1,10 @@
 # represents a position node in the aisle linked list
 class AisleNode:
-    # the node "ahead" of this - closer to the head of the plane
+    # the node "ahead" of this - closer to the BACK of the plane
     ahead = None
     # the node "behind" this - closer to the nose of the plane
     behind = None
-    # what is "in" this node at the moment, has an underscore as should not be accessed directly by other objects
+    # what is "in" this node at the moment, has an underscore as should not be accessed directly by other objects for the most part
     _passenger = None
     
     # ** no init function needed **
@@ -36,19 +36,21 @@ class AisleNode:
 
     # runs one single tick of movement on this cell, moving passengers forward/to seats as appropriate.
     # given the number of the current "tick" to pass to passengers as appropriate
+    # returns TRUE if attempted to take a movement (had a passenger)
     def single_tick(self, tick_count):
         # only does something if this node has a passenger
-        if self.passenger != None and self.passenger.take_action():
+        if self._passenger != None and self._passenger.take_action():
             # Is the passenger currently in their row? --> Make progress towards seating them
-            if self.passenger.seat_assignment == self.row:
-                self.passenger.seat_time = tick_count # set the time that the passenger sat at 
-                self.passenger = None # remove person from aisle
+            if self._passenger.seat_assignment[0] == self.row:
+                self._passenger.seat(tick_count)
             # If not, make progress towards moving them towards their row (guaranteed to be ahead of them)
-            # (Does not check if there is an ahead cell - if the passenger isn't in there current row, there ought to be one ahead of them,
+            # (Does not check if there is an ahead cell - if the passenger isn't in their current row, there ought to be one ahead of them,
             # if there is not, implies an issue with setup)
             elif not self.ahead.passenger:
                 self.ahead.add_person_to_node(self.passenger)
                 self.passenger = None
+
+            return True
 
 # represents a list of aisle cells for a certain number of rows in an airplane
 class Aisle:
@@ -98,9 +100,14 @@ class Aisle:
     # runs a single tick of movement on the passengers in the aisle.
     # starts from the END of the airplane (closest to the tail) and ends at the BEGINNING of the airplane (closest to the nose)
     # to allow all passengers to move as soon as possible/appropriate
-    def run_tick(self):
+    # returns TRUE if anything happened (actions took place)
+    def run_tick(self, tick_count):
         tail = self.get_last_node()
+        something_happened = False
 
         while tail:
-            tail.single_tick()
+            if tail.single_tick(tick_count):
+                something_happened = True
             tail = tail.behind
+        
+        return something_happened
