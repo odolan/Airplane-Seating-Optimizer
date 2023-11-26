@@ -1,11 +1,9 @@
-import copy
 import random
 from person import Person
 from airplane import Airplane
 
-## ** A WORK IN PROGRESS ** ##
-
-#
+# runs a random simulation of an airplane with given dimensions, assigns a passenger to each seat,
+# they board in random order
 def random_simulation(num_rows, num_cols):
     # generate passengers
     passengers = []
