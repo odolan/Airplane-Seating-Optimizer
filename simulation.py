@@ -18,7 +18,7 @@ def random_simulation(num_rows, num_cols):
 
     # no body needed, function returns boolean, runs as long as is needed
     while airplane.single_tick():
-        print(airplane)
+        continue
 
     return airplane.ticks_needed
 
