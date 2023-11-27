@@ -44,7 +44,6 @@ class AisleNode:
     # given the number of the current "tick" to pass to passengers as appropriate
     # returns TRUE if attempted to take a movement (had a passenger)
     def single_tick(self, tick_count):
-        print("tick ", self.row)
         # only does something if this node has a passenger
         if self._passenger != None and self._passenger.take_action():
             # Is the passenger currently in their row? --> Make progress towards seating them
@@ -55,13 +54,12 @@ class AisleNode:
             # (Does not check if there is an ahead cell - if the passenger isn't in their current row, there ought to be one ahead of them,
             # if there is not, implies an issue with setup)
             elif self.ahead.empty():
-                print("TRIED TO MOVE UP")
                 self.ahead.add_person_to_node(self._passenger)
                 self._passenger = None
 
             return True
 
-        return False
+        return self._passenger != None
 
 # represents a list of aisle cells for a certain number of rows in an airplane
 class Aisle:
@@ -122,30 +120,3 @@ class Aisle:
             tail = tail.behind
         
         return something_happened
-
-example_aisle = Aisle(5)
-print(example_aisle)
-
-# person = Person(0, (4, 4))
-# example_aisle.head._passenger = person
-# print(example_aisle)
-
-# example_aisle.run_tick(1)
-# print(example_aisle)
-# print("SAT: ", person.isInSeat())
-
-# example_aisle.run_tick(1)
-# print(example_aisle)
-# print("SAT: ", person.isInSeat())
-
-# example_aisle.run_tick(1)
-# print(example_aisle)
-# print("SAT: ", person.isInSeat())
-
-# example_aisle.run_tick(1)
-# print(example_aisle)
-# print("SAT: ", person.isInSeat())
-
-# example_aisle.run_tick(1)
-# print(example_aisle)
-# print("SAT: ", person.isInSeat())

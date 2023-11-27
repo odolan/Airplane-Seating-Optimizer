@@ -26,4 +26,4 @@ def random_simulation(num_rows, num_cols):
 def single_simulation(passenger_list, num_rows, num_cols):
     pass
 
-print(random_simulation(10, 3))
+print(random_simulation(5, 3))
