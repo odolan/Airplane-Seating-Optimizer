@@ -44,7 +44,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace):
 
         # mutate some of the surviving members of the population
         print("Running Mutation...")
-        for i in range(15):
+        for i in range(int(population_size / 6)):
             mutate_index = random.randint(0, len(population) - 1)
             population[mutate_index].mutate(rows)
 
@@ -66,4 +66,4 @@ def genetic(generations, rows, cols, population_size, num_to_replace):
         print("GENERATION ", str(generation + 1), " SCORE: ", statistics.mean(scores))
 
 # GENETIC: generations, rows, cols, pop_size, num to replace
-genetic(10, 25, 3, 25, 3)
+genetic(200, 25, 3, 500, 50)

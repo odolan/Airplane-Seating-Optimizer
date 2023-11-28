@@ -40,10 +40,9 @@ class Citizen():
 
     # HELPER FUNCTION FOR REPRODUCTION: removes passenger from the list with the supplied seat assignment
     def remove_pass_with_assign(self, passenger_master_list, assignment):
-        for i in range(len(passenger_master_list) - 1):
+        for i in range(len(passenger_master_list)):
             if passenger_master_list[i].seat_assignment == assignment:
                 passenger_master_list.pop(i)
-                print("removed ", assignment)
                 break
 
     # returns a citizen that is the "offspring" of this and the supplied other citizen
@@ -51,7 +50,6 @@ class Citizen():
     def reproduce(self, other_citizen, passenger_master_list):
         crossover_list = [None] * len(self.specific_ordering)
         random.shuffle(passenger_master_list)
-        print("INITIAL PML: ", len(passenger_master_list))
 
         # List of tuples of seat arrangments that have been sat - easy way to check for citizen equality/presence due to the deepcopying that has been done,
         # who knows what kind of errors would pop up
@@ -65,58 +63,42 @@ class Citizen():
             if i % 2 == 0:
                 rand_passenger = self.specific_ordering[rand_index]
                 # regenerate random passengers if this passenger (checked by the list of seat assignments added) already part of child
-                while crossover_list[rand_index] == None and rand_passenger.seat_assignment in used_seatings and try_count < len(passenger_master_list) * 2:
+                while (crossover_list[rand_index] != None or rand_passenger.seat_assignment in used_seatings) and try_count < len(passenger_master_list) * 2:
                     rand_index = random.randint(0, len(self.specific_ordering) - 1)
                     rand_passenger = self.specific_ordering[rand_index]
                     try_count += 1
 
                 # just couldn't get one... skip and will let be randomly assigned
                 if try_count >= len(passenger_master_list) * 2:
-                    print("skipped")
                     continue
 
                 # once a unique has been found, assign a copy to the final list, add its seat assignment to the "seen", remove it from the master list
                 # so passengers that aren't added in this way are added in the end
 
-                if crossover_list[rand_index] != None:
-                    print("OVERWRITE")
-
                 crossover_list[rand_index] = deepcopy(rand_passenger)
                 used_seatings.append(rand_passenger.seat_assignment)
-                print("added ", rand_passenger.seat_assignment)
                 self.remove_pass_with_assign(passenger_master_list, rand_passenger.seat_assignment)
             else:
                 rand_passenger = other_citizen.specific_ordering[rand_index]
-                while crossover_list[rand_index] == None and rand_passenger.seat_assignment in used_seatings and try_count < len(passenger_master_list) * 2:
+                while (crossover_list[rand_index] != None or rand_passenger.seat_assignment in used_seatings) and try_count < len(passenger_master_list) * 2:
                     rand_index = random.randint(0, len(self.specific_ordering) - 1)
                     rand_passenger = other_citizen.specific_ordering[rand_index]
                     try_count += 1
 
                 if try_count >= len(passenger_master_list) * 2:
-                    print("skipped")
                     continue
-
-                if crossover_list[rand_index] != None:
-                    print("OVERWRITE")
 
                 crossover_list[rand_index] = deepcopy(rand_passenger)
                 used_seatings.append(rand_passenger.seat_assignment)
-                print("added ", rand_passenger.seat_assignment)
                 self.remove_pass_with_assign(passenger_master_list, rand_passenger.seat_assignment)
-
-        print("SUCCESSFULLY ASSIGNED: ", crossover_list)
-        print("PML LENGTH: ", len(passenger_master_list))
-        print("NONE COUNT: ", crossover_list.count(None))
         
         # whatever is not filled is just randomly assigned
         for index in range(len(crossover_list)):
             if crossover_list[index] == None:
                 rand_passenger = random.choice(passenger_master_list)
-                print("COMPULSORY: ", rand_passenger.visualize())
                 self.remove_pass_with_assign(passenger_master_list, rand_passenger.seat_assignment)
                 crossover_list[index] = rand_passenger
-        
-        print("FINAL ORDERING: ", crossover_list)
+
         new_citizen.update_ordering(crossover_list)
         return new_citizen
 
@@ -143,7 +125,7 @@ class Citizen():
     def calc_score(self):
         scores = []
 
-        for i in range(100):
+        for i in range(25):
             scores.append(self.airplane.calc_ticks())
             self.airplane = Airplane(self.num_rows, self.num_cols, deepcopy(self.specific_ordering))
         
@@ -158,19 +140,18 @@ class Citizen():
         self.airplane = Airplane(self.num_rows, self.num_cols, deepcopy(self.specific_ordering))
         self.calc_score()
 
-passengers = []
+# passengers = []
 
-for row in range(5):
-    for col in range(3):
-        passengers.append(Person(random.uniform(0, 0.25), (row, col)))
+# for row in range(5):
+#     for col in range(3):
+#         passengers.append(Person(random.uniform(0, 0.25), (row, col)))
 
-citizen1 = Citizen(5, 3, passengers)
-citizen2 = Citizen(5, 3, passengers)
-
+# citizen1 = Citizen(5, 3, passengers)
+# citizen2 = Citizen(5, 3, passengers)
 
 # print(citizen1)
 # print(citizen2)
 
-child = citizen1.reproduce(citizen2, passengers)
+# child = citizen1.reproduce(citizen2, passengers)
 
 # print(child)
