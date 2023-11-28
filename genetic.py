@@ -19,22 +19,6 @@ def tournament_selection(population, num_survivors):
 
     return survivors
 
-# produces a crossover to combine two parents into one child
-def crossover(parent1, parent2):
-    # Assuming both parents are lists of people
-    crossover_point = len(parent1) // 2
-
-    # Combine the first half of parent1 with the unique individuals from parent2
-    child = parent1[:crossover_point]
-    child_set = set(child)
-
-    for person in parent2[crossover_point:]:
-        if person not in child_set:
-            child.append(person)
-            child_set.add(person)
-
-    return child
-
 # runs genetic algorithm
 def genetic(generations, rows, cols, population_size, num_to_replace):
     passenger_master_list = []
@@ -54,19 +38,32 @@ def genetic(generations, rows, cols, population_size, num_to_replace):
     # update over generations
     for generation in tqdm(range(generations)):
 
+        print("Running Tournaments...")
         # perform tournaments - challenge each member of the population to "survive"
         population = tournament_selection(population, population_size - num_to_replace)
 
+        # mutate some of the surviving members of the population
+        print("Running Mutation...")
         for i in range(15):
             mutate_index = random.randint(0, len(population) - 1)
             population[mutate_index].mutate(rows)
 
+        print("Running Crossovers...")
+        # some of the fit survivors will reproduce, create offspring similar to them
+        for i in range(num_to_replace):
+            parent1 = population[random.randint(0, len(population) - 1)]
+            parent2 = population[random.randint(0, len(population) - 1)]
+
+            population.append(parent1.reproduce(parent2, deepcopy(passenger_master_list)))
+
         scores = []
 
+        print("Final Scoring...")
         for citizen in population:
             scores.append(citizen.score)
 
         print("GENERATION ", str(generation + 1), " MIN SCORE IN POPULATION: ", min(scores))
         print("GENERATION ", str(generation + 1), " SCORE: ", statistics.mean(scores))
 
-genetic(100, 8, 3, 100, 0)
+# GENETIC: generations, rows, cols, pop_size, num to replace
+genetic(10, 25, 3, 25, 3)

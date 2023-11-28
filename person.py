@@ -35,7 +35,13 @@ class Person:
 
     # Method used to visualize a passenger on the airplane (not just generic information about them)
     def visualize(self):
-        return str(self.seat_assignment)
+        result = "("
+        result += str(self.seat_assignment[0])
+        result += ", "
+        result += str(self.seat_assignment[1])
+        result += ") - "
+        result += str(self.delay_prob)
+        return result
 
     # returns true with probability of 1 - delay_prob, false with probability of delay_prob
     def take_action(self):
