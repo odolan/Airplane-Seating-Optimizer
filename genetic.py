@@ -2,6 +2,7 @@ import pandas as pd
 import random
 from person import Person
 from airplane import Airplane
+from citizen import Citizen
 import copy
 
 # runs tournament to select parent boarding orders to use as parents for next rounds
@@ -58,9 +59,6 @@ def crossover(parent1, parent2):
 
     return child
 
-def mutate(member):
-    return member
-
 # produces a random bordering order for a plane
 def produce_boarding_ordering(rows, cols):
     # generate passengers
@@ -74,12 +72,19 @@ def produce_boarding_ordering(rows, cols):
     return passengers
 
 # runs genetic algorithm
-def genetic(generations):
-    rows = 20
-    seats_per_row = 4
+def genetic(generations, rows, cols, population_size):
+    passenger_master_list = []
+    population = []
 
-    # generate a random batch of 100 boarding orders
-    population = [produce_boarding_ordering(rows, seats_per_row) for i in range(10)]
+    # builds a master list of passengers
+    for row in range(rows):
+        for col in range(cols):
+            passenger_master_list.append(Person(random.uniform(0, 0.35), (row, col)))
+
+    # builds X simulations with same set of passengers, airplane dimensions, etc. but random orderings
+    # (from citizen to citizen) to compare, battle, and let the best ordering win out!
+    for i in range(population_size):
+        population.append(Citizen(rows, cols, passenger_master_list))
 
     for generation in range(generations):
 

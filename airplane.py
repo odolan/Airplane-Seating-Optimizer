@@ -28,8 +28,6 @@ class Airplane:
 
     passengers = []
 
-    ticks_needed = 0
-
     # builds an airplane with given dimensions and list of passengers
     # (columns = seats per row on each side)
     def __init__(self, rows, columns, passengers):
@@ -65,15 +63,24 @@ class Airplane:
             result += "\n"
     
         return result
+    
+    # returns the number of ticks needed to seat this airplane
+    def calc_ticks(self):
+        ticks_needed = 0
+
+        while self.single_tick(ticks_needed):
+            ticks_needed += 1
+        
+        return ticks_needed
+
 
     # initiates a single tick of movement throughout the aisle. adds passengers in order they are provided to the airplane at
     # construction, uses given tick_count
-    def single_tick(self):
+    def single_tick(self, current_tick):
         something_happened = False
 
         # if running a tick is still needed
-        if self.aisle.run_tick(self.ticks_needed + 1):
-            self.ticks_needed += 1
+        if self.aisle.run_tick(current_tick):
             something_happened = True
 
         # add people into the airplane when possible
@@ -82,3 +89,7 @@ class Airplane:
             something_happened = True
         
         return something_happened
+
+    # sets this airplane to have the supplied ordering of passengers
+    def set_ordering(self, new_ordering):
+        self.passengers = new_ordering
