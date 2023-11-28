@@ -43,9 +43,13 @@ class Citizen():
     def reproduce(self, other_citizen):
         pass
 
-    # forces this citizen to "battle" with the other to survive, returns the victor/survivor of the two
+    # forces this citizen to "battle" with the other to survive, returns the victor/survivor of the two (simply the one with
+    # the highest score)
     def battle(self, other_citizen):
-        pass
+        if (self.score <= other_citizen.score):
+            return self
+        else:
+            return other_citizen
 
     # returns a string representation of this citizen, namely the ordering of the passengers it uses
     def __str__(self):
@@ -60,7 +64,7 @@ class Citizen():
     def calc_score(self):
         scores = []
 
-        for i in range(750):
+        for i in range(250):
             scores.append(self.airplane.calc_ticks())
             self.airplane = Airplane(self.num_rows, self.num_cols, deepcopy(self.specific_ordering))
         
