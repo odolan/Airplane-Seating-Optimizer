@@ -28,7 +28,10 @@ class Citizen():
     def mutate(self, num_swaps):
         for swap in range(num_swaps):
             first = random.randint(0, len(self.specific_ordering) - 1)
-            second = random.randint(0, len(self.specific_ordering) - 1)
+
+            lower_bound = max(0, first - 5)
+            upper_bound = min(len(self.specific_ordering) - 1, first + 5)
+            second = random.randint(lower_bound, upper_bound)
 
             temp = self.specific_ordering[first]
             self.specific_ordering[first] = self.specific_ordering[second]
