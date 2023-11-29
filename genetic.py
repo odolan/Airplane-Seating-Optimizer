@@ -6,8 +6,11 @@ from citizen import Citizen
 from copy import deepcopy
 from tqdm import tqdm
 import statistics
+import matplotlib.pyplot as plt
 
-# runs tournament to select parent boarding orders to use as parents for next rounds
+# runs a tournament on the supplied population that will output the given number of survivor
+# a tournament is a random pairing of two citizens from the population, and the one with the lowest score (best seating)
+# is returned
 def tournament_selection(population, num_survivors):
     survivors = []
 
@@ -19,8 +22,12 @@ def tournament_selection(population, num_survivors):
 
     return survivors
 
-# runs genetic algorithm
-def genetic(generations, rows, cols, population_size, num_to_replace):
+min_scores = []
+avg_scores = []
+
+# runs genetic algorithm, returns the initial efficient solution among the random population
+# and the final, most efficient solution among the random population
+def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mutate):
     passenger_master_list = []
     population = []
 
@@ -35,6 +42,15 @@ def genetic(generations, rows, cols, population_size, num_to_replace):
     for i in tqdm(range(population_size)):
         population.append(Citizen(rows, cols, deepcopy(passenger_master_list)))
 
+    # EXTRACT THE INTIAL MINIMUM FROM THE RANDOMLY GENERATED POPULATION
+    min_score = 9999
+    initial_min_score_citizen = None
+
+    for citizen in population:
+        if citizen.score < min_score:
+            min_score = citizen.score
+            initial_min_score_citizen = citizen
+
     # update over generations
     for generation in tqdm(range(generations)):
 
@@ -44,7 +60,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace):
 
         # mutate some of the surviving members of the population
         print("Running Mutation...")
-        for i in range(int(population_size / 6)):
+        for i in range(num_to_mutate):
             mutate_index = random.randint(0, len(population) - 1)
             population[mutate_index].mutate(rows)
 
@@ -64,6 +80,28 @@ def genetic(generations, rows, cols, population_size, num_to_replace):
 
         print("GENERATION ", str(generation + 1), " MIN SCORE IN POPULATION: ", min(scores))
         print("GENERATION ", str(generation + 1), " SCORE: ", statistics.mean(scores))
+        print("POPULATION SIZE: ", len(population))
+        min_scores.append(min(scores))
+        avg_scores.append(statistics.mean(scores))
+    
+    plt.ylabel("Generation Score")
+    plt.xlabel("Generation")
+    x = range(1, generations + 1)
+    plt.plot(x, avg_scores, label="Average")
+    plt.plot(x, min_scores, label="Minimum")
+    plt.legend()
+    plt.savefig("ScoreGraph.png")
 
-# GENETIC: generations, rows, cols, pop_size, num to replace
-genetic(200, 25, 3, 500, 50)
+    min_score = 9999
+    final_min_score_citizen = None
+
+    for citizen in population:
+        if citizen.score < min_score:
+            min_score = citizen.score
+            final_min_score_citizen = citizen
+
+    return (initial_min_score_citizen, final_min_score_citizen)
+
+# GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate
+genetic(100, 25, 3, 100, 8, 15)
+
