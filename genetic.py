@@ -80,7 +80,6 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
 
         print("GENERATION ", str(generation + 1), " MIN SCORE IN POPULATION: ", min(scores))
         print("GENERATION ", str(generation + 1), " SCORE: ", statistics.mean(scores))
-        print("POPULATION SIZE: ", len(population))
         min_scores.append(min(scores))
         avg_scores.append(statistics.mean(scores))
     
@@ -102,6 +101,39 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
 
     return (initial_min_score_citizen, final_min_score_citizen)
 
+
 # GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate
-genetic(100, 25, 3, 100, 8, 15)
+initial, final = genetic(350, 10, 3, 600, 20, 200)
+
+plt.clf()
+plt.xlabel("Nth Passenger in Seating Order")
+plt.ylabel("Row of Seat Assignment For nth Passenger")
+
+x = range(len(initial.specific_ordering))
+initial_row_data = []
+final_row_data = []
+
+for i in range(len(initial.specific_ordering)):
+    initial_row_data.append(initial.specific_ordering[i].seat_assignment[0])
+    final_row_data.append(final.specific_ordering[i].seat_assignment[0])
+
+plt.scatter(x, initial_row_data, label="Initial")
+plt.scatter(x, final_row_data, label="Final")
+plt.legend()
+plt.savefig("RowGraph.png")
+
+plt.clf()
+plt.xlabel("Nth Passenger in Seating Order")
+plt.ylabel("Delay Probability of nth Passenger")
+initial_row_data = []
+final_row_data = []
+
+for i in range(len(initial.specific_ordering)):
+    initial_row_data.append(initial.specific_ordering[i].delay_prob)
+    final_row_data.append(final.specific_ordering[i].delay_prob)
+
+plt.scatter(x, initial_row_data, label="Initial")
+plt.scatter(x, final_row_data, label="Final")
+plt.legend()
+plt.savefig("DelayGraph.png")
 
