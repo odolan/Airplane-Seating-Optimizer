@@ -36,11 +36,14 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
         for col in range(cols):
             passenger_master_list.append(Person(random.uniform(0, 0.35), (row, col)))
 
+    population = []
+
     # builds X simulations with same set of passengers, airplane dimensions, etc. but random orderings
     # (from citizen to citizen) to compare, battle, and let the best ordering win out!
     print("BUILDING INITIAL POPULATION...")
     for i in tqdm(range(population_size)):
         population.append(Citizen(rows, cols, deepcopy(passenger_master_list)))
+        # update over generations
 
     # EXTRACT THE INTIAL MINIMUM FROM THE RANDOMLY GENERATED POPULATION
     min_score = 9999
@@ -51,9 +54,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
             min_score = citizen.score
             initial_min_score_citizen = citizen
 
-    # update over generations
     for generation in tqdm(range(generations)):
-
         print("Running Tournaments...")
         # perform tournaments - challenge each member of the population to "survive"
         population = tournament_selection(population, population_size - num_to_replace)
@@ -82,7 +83,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
         print("GENERATION ", str(generation + 1), " SCORE: ", statistics.mean(scores))
         min_scores.append(min(scores))
         avg_scores.append(statistics.mean(scores))
-    
+        
     plt.ylabel("Generation Score")
     plt.xlabel("Generation")
     x = range(1, generations + 1)
@@ -101,14 +102,10 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
 
     return (initial_min_score_citizen, final_min_score_citizen)
 
-
-# GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate
-initial, final = genetic(350, 10, 3, 600, 20, 200)
+# GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate, num iterations
+initial, final = genetic(20, 20, 3, 50, 5, 10)
 
 plt.clf()
-plt.xlabel("Nth Passenger in Seating Order")
-plt.ylabel("Row of Seat Assignment For nth Passenger")
-
 x = range(len(initial.specific_ordering))
 initial_row_data = []
 final_row_data = []
@@ -125,15 +122,16 @@ plt.savefig("RowGraph.png")
 plt.clf()
 plt.xlabel("Nth Passenger in Seating Order")
 plt.ylabel("Delay Probability of nth Passenger")
-initial_row_data = []
-final_row_data = []
+initial_delay_data = []
+final_delay_data = []
 
 for i in range(len(initial.specific_ordering)):
-    initial_row_data.append(initial.specific_ordering[i].delay_prob)
-    final_row_data.append(final.specific_ordering[i].delay_prob)
+    initial_delay_data.append(initial.specific_ordering[i].delay_prob)
+    final_delay_data.append(final.specific_ordering[i].delay_prob)
 
-plt.scatter(x, initial_row_data, label="Initial")
-plt.scatter(x, final_row_data, label="Final")
+plt.clf()
+plt.scatter(x, initial_delay_data, label="Initial")
+plt.scatter(x, final_delay_data, label="Final")
 plt.legend()
 plt.savefig("DelayGraph.png")
 
