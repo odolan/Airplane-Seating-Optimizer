@@ -20,7 +20,7 @@ class Citizen():
         self.num_cols = num_cols
 
         self.specific_ordering = deepcopy(passenger_set)
-        # random.shuffle(self.specific_ordering)
+        random.shuffle(self.specific_ordering)
         
         self.update_ordering(self.specific_ordering)
 

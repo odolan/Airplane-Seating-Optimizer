@@ -33,7 +33,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
 
     # builds a master list of passengers - this should NOT be mutated after creation :)
     for row in range(rows):
-        for col in range(cols):
+        for col in range(cols * 2):
             passenger_master_list.append(Person(random.uniform(0, 0.35), (row, col)))
 
     population = []
@@ -103,10 +103,13 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
     return (initial_min_score_citizen, final_min_score_citizen)
 
 # GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate, num iterations
-initial, final = genetic(20, 20, 3, 50, 5, 10)
+initial, final = genetic(250, 15, 3, 100, 8, 20)
 
 plt.clf()
 x = range(len(initial.specific_ordering))
+
+plt.xlabel("Nth Passenger in Seating Order")
+plt.xlabel("Row Assigned to nth Passenger")
 initial_row_data = []
 final_row_data = []
 
@@ -129,9 +132,22 @@ for i in range(len(initial.specific_ordering)):
     initial_delay_data.append(initial.specific_ordering[i].delay_prob)
     final_delay_data.append(final.specific_ordering[i].delay_prob)
 
-plt.clf()
 plt.scatter(x, initial_delay_data, label="Initial")
 plt.scatter(x, final_delay_data, label="Final")
 plt.legend()
 plt.savefig("DelayGraph.png")
 
+plt.clf()
+plt.xlabel("Nth Passenger in Seating Order")
+plt.ylabel("Column Assigned to nth Passenger")
+initial_delay_data = []
+final_delay_data = []
+
+for i in range(len(initial.specific_ordering)):
+    initial_delay_data.append(initial.specific_ordering[i].seat_assignment[1])
+    final_delay_data.append(final.specific_ordering[i].seat_assignment[1])
+
+plt.scatter(x, initial_delay_data, label="Initial")
+plt.scatter(x, final_delay_data, label="Final")
+plt.legend()
+plt.savefig("ColumnGraph.png")
