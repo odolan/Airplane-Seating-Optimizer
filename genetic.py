@@ -8,9 +8,8 @@ from tqdm import tqdm
 import statistics
 import matplotlib.pyplot as plt
 
-# runs a tournament on the supplied population that will output the given number of survivor
-# a tournament is a random pairing of two citizens from the population, and the one with the lowest score (best seating)
-# is returned
+# runs a tournament on the supplied population that will output the given number of survivors
+# a tournament is a random pairing of two citizens from the population, and the one with the lowest score (best seating) is returned
 def tournament_selection(population, num_survivors):
     survivors = []
 
@@ -22,21 +21,27 @@ def tournament_selection(population, num_survivors):
 
     return survivors
 
-min_scores = []
-avg_scores = []
-
 # runs genetic algorithm, returns the initial efficient solution among the random population
-# and the final, most efficient solution among the random population
+# AND the final, most efficient solution among the random population as a tuple.
+# Generates and saves plot of scores over generations.
 def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mutate):
+    # used to collect data on generation scores that will be plotted later
+    min_scores = []
+    avg_scores = []
+
+    # a MASTER LIST of passengers that will be distributed to each citizen - this list should not be mutated
+    # to ensure that all citizens have the same passengers (same delay probabilities!) that can
+    # be mutated individually
     passenger_master_list = []
+
+    # list of all of the citizens in the population
     population = []
 
-    # builds a master list of passengers - this should NOT be mutated after creation :)
+    # builds a master list of passengers - again, this should NOT be mutated after creation :)
     for row in range(rows):
         for col in range(cols * 2):
             passenger_master_list.insert(0, Person(random.uniform(0, 0.35), (row, col)))
 
-    population = []
 
     # builds X simulations with same set of passengers, airplane dimensions, etc. but random orderings
     # (from citizen to citizen) to compare, battle, and let the best ordering win out!
@@ -44,6 +49,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
     for i in tqdm(range(population_size)):
         population.append(Citizen(rows, cols, deepcopy(passenger_master_list)))
         # update over generations
+
 
     # EXTRACT THE INTIAL MINIMUM FROM THE RANDOMLY GENERATED POPULATION
     min_score = 9999
@@ -54,25 +60,28 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
             min_score = citizen.score
             initial_min_score_citizen = citizen
 
+    # Runs natural selection/evolution for number of generations
     for generation in tqdm(range(generations)):
         print("Running Tournaments...")
-        # perform tournaments - challenge each member of the population to "survive"
+        # 1. Perform tournaments until we have popsize - numreplace "winners" or "survivors"
         population = tournament_selection(population, population_size - num_to_replace)
 
-        # mutate some of the surviving members of the population
+        # 2. Mutate number of citizens in surviving population (post-tournaments)
         print("Running Mutation...")
         for i in range(num_to_mutate):
             mutate_index = random.randint(0, len(population) - 1)
             population[mutate_index].mutate(rows)
 
         print("Running Crossovers...")
-        # some of the fit survivors will reproduce, create offspring similar to them
+        # 3. numreplace of the the fit survivors will reproduce, create offspring similar to them
+        # Population size is consistent from generation to generation
         for i in range(num_to_replace):
             parent1 = population[random.randint(0, len(population) - 1)]
             parent2 = population[random.randint(0, len(population) - 1)]
 
             population.append(parent1.reproduce(parent2, deepcopy(passenger_master_list)))
 
+        # 4. Score all of the citizens, use this information to build list for plots later.
         scores = []
 
         print("Final Scoring...")
@@ -84,6 +93,8 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
         min_scores.append(min(scores))
         avg_scores.append(statistics.mean(scores))
         
+
+    # Plot score over generations
     plt.ylabel("Generation Score")
     plt.xlabel("Generation")
     x = range(1, generations + 1)
@@ -92,6 +103,8 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
     plt.legend()
     plt.savefig("ScoreGraph.png")
 
+
+    # get the most efficient citizen among final population
     min_score = 9999
     final_min_score_citizen = None
 
@@ -103,8 +116,10 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
     return (initial_min_score_citizen, final_min_score_citizen)
 
 # GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate, num iterations
-initial, final = genetic(50, 15, 3, 100, 6, 20)
+initial, final = genetic(10, 15, 3, 100, 6, 20)
 
+
+## CODE FOR PLOTTING DATA ABOUT THE INTIAL/FINAL CITIZENS OUTPUT BY GENETIC ##
 plt.clf()
 x = range(len(initial.specific_ordering))
 
