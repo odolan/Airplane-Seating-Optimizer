@@ -1,16 +1,15 @@
-from person import Person
-
 # represents a position node in the aisle linked list
 class AisleNode:
-    # the node "ahead" of this - closer to the BACK of the plane
+    # the node "ahead" of this - closer to the back (tail) of the plane
     ahead = None
     # the node "behind" this - closer to the nose of the plane
     behind = None
-    # what is "in" this node at the moment, has an underscore as should not be accessed directly by other objects for the most part
+    # what is "in" this node at the moment, either a Person or None
     _passenger = None
-
+    # what row this aisle node is for
     row = 0
 
+    # builds an aisle node at given row
     def __init__(self, row):
         self.row = row
 
@@ -41,12 +40,12 @@ class AisleNode:
             return '_'
 
     # runs one single tick of movement on this cell, moving passengers forward/to seats as appropriate.
-    # given the number of the current "tick" to pass to passengers as appropriate
-    # returns TRUE if attempted to take a movement (had a passenger)
+    # given the number of the current "tick" to pass to passengers as appropriate.
+    # returns TRUE if any movement/actions took place at all (including "skipped" actions)
     def single_tick(self, tick_count):
-        # only does something if this node has a passenger
+        # only does something if this node has a passenger AND they don't "skip" the action
         if self._passenger != None and self._passenger.take_action():
-            # Is the passenger currently in their row? --> Make progress towards seating them
+            # Is the passenger currently in their row? --> Seat them
             if self._passenger.seat_assignment[0] == self.row:
                 self._passenger.seat(tick_count)
                 self._passenger = None
@@ -65,8 +64,8 @@ class AisleNode:
 class Aisle:
     head = None
 
-    # initializes an aisle of given number of rows (nodes) that is at least 1, holds a reference to the first cell
-    # (closest to the nose of the airplane - where passengers enter from)
+    # initializes an aisle of given number of rows (nodes), holds a reference to the first cell
+    # (head is closest to the nose of the airplane - where passengers enter from)
     def __init__(self, rows):
         self.head = AisleNode(0)
 
@@ -108,8 +107,8 @@ class Aisle:
     
     # runs a single tick of movement on the passengers in the aisle.
     # starts from the END of the airplane (closest to the tail) and ends at the BEGINNING of the airplane (closest to the nose)
-    # to allow all passengers to move as soon as possible/appropriate
-    # returns TRUE if anything happened (actions took place)
+    # so a passenger's movement is dependent on what happened in front of them.
+    # returns TRUE if anything happened (even a skipped action)
     def run_tick(self, tick_count):
         tail = self.get_last_node()
         something_happened = False

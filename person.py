@@ -10,7 +10,7 @@ class Person:
     seat_assignment = None
     # number of ticks that took place before passenger was seated
     seat_time = None
-    id = random.randint(100000, 999999) # random 6 digit ID
+    id = random.randint(100000, 999999) # random 6 digit ID, unused
 
     # a set of "groups" a passenger belongs to, such as first class, veteran, frequent flier, family w/ young child, etc.
     classes = {}

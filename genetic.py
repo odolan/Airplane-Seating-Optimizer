@@ -34,7 +34,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
     # builds a master list of passengers - this should NOT be mutated after creation :)
     for row in range(rows):
         for col in range(cols * 2):
-            passenger_master_list.append(Person(random.uniform(0, 0.35), (row, col)))
+            passenger_master_list.insert(0, Person(random.uniform(0, 0.35), (row, col)))
 
     population = []
 
@@ -103,7 +103,7 @@ def genetic(generations, rows, cols, population_size, num_to_replace, num_to_mut
     return (initial_min_score_citizen, final_min_score_citizen)
 
 # GENETIC FUNC ARGS: generations, rows, cols, pop_size, num to replace, num to mutate, num iterations
-initial, final = genetic(250, 15, 3, 100, 8, 20)
+initial, final = genetic(50, 15, 3, 100, 6, 20)
 
 plt.clf()
 x = range(len(initial.specific_ordering))

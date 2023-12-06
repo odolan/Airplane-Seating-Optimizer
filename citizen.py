@@ -130,7 +130,7 @@ class Citizen():
     def calc_score(self):
         scores = []
 
-        for i in range(10):
+        for i in range(20):
             scores.append(self.airplane.calc_ticks())
             self.airplane = Airplane(self.num_rows, self.num_cols, deepcopy(self.specific_ordering))
         
