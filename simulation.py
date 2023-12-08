@@ -41,7 +41,7 @@ def update_passenger_positions(people):
             people[i].update_position()
                 
 
-initial, final = genetic(75, 18, 3, 100, 8, 20)
+initial, final = genetic(15, 18, 3, 100, 8, 20)
 # best_citizen = min(final_population, key=lambda citizen: citizen.score)  # Assuming lower score is better
 # optimized_boarding_sequence = best_citizen.specific_ordering
 
@@ -129,7 +129,7 @@ def run(order):
     start_time = time.time()  # Record the start time
 
     
-    image = pygame.image.load('Screenshot 2023-11-30 at 11.40.05 AM.png')
+    image = pygame.image.load('AirplaneImage.jpeg')
     image = pygame.transform.scale(image, (455, 300))  # Replace with desired size
     
     animation_started = False
